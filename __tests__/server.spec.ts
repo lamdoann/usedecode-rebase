@@ -1,21 +1,29 @@
 import { server, app } from '../src/server';
-import * as jsonist from 'jsonist';
-
-const urlBase = `http://localhost:${app.get('port')}`;
+import * as request from 'supertest';
 
 describe('server', () => {
   it('responds hello', done => {
-    jsonist.get(urlBase, (_, body) => {
-      expect(body.msg).toEqual('Hello, world');
-      done();
-    });
+    request(app)
+      .get('/')
+      .expect(200, { msg: 'Hello, world' }, done)
   });
 
   it('reverses', done => {
-    jsonist.get(urlBase + '/reverse/hello', (_, body) => {
-      expect(body.msg).toEqual('olleh');
-      done();
-    });
+    request(app)
+      .get('/reverse/hello')
+      .expect(200, { msg: 'olleh' }, done);
+  });
+
+  it('responds uppercase', done => {
+    request(app)
+      .get('/uppercase?msg=hello')
+      .expect(200, { msg: 'HELLO' }, done);
+  });
+
+  it('responds lowercase', done => {
+    request(app)
+      .get('/lowercase?msg=LamDoan')
+      .expect(200, { msg: 'lamdoan' }, done);
   });
 
   afterAll(async () => {
